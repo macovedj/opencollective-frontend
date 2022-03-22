@@ -10,17 +10,20 @@ import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { toIsoDateStr } from '../../lib/date-utils';
 import { formatErrorMessage } from '../../lib/errors';
+import { i18nTaxType } from '../../lib/i18n/taxes';
 import { attachmentDropzoneParams, attachmentRequiresFile } from './lib/attachments';
+import { expenseIsSubjectToVAT } from './lib/utils';
 
-import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import { I18nBold } from '../I18nFormatters';
 import MessageBox from '../MessageBox';
 import StyledDropzone from '../StyledDropzone';
-import { P } from '../Text';
+import StyledHr from '../StyledHr';
+import { P, Span } from '../Text';
 
+import ExpenseAmountBreakdown from './ExpenseAmountBreakdown';
 import ExpenseItemForm from './ExpenseItemForm';
-import ExpenseItemsTotalAmount from './ExpenseItemsTotalAmount';
+import ExpenseVATFormikFields from './ExpenseVATFormikFields';
 
 /** Init a new expense item with default attributes */
 const newExpenseItem = attrs => ({
@@ -186,6 +189,8 @@ class ExpenseFormItems extends React.PureComponent {
 
     const onRemove = requireFile || items.length > 1 ? this.remove : null;
     const availableCurrencies = this.getPossibleCurrencies();
+    const isSubjectToVAT = expenseIsSubjectToVAT(this.props.collective, values);
+    const taxType = isSubjectToVAT ? 'VAT' : null;
     return (
       <Box>
         {this.renderErrors()}
@@ -206,14 +211,29 @@ class ExpenseFormItems extends React.PureComponent {
             hasMultiCurrency={!index && availableCurrencies?.length > 1} // Only display currency picker for the first item
             availableCurrencies={availableCurrencies}
             onCurrencyChange={this.onCurrencyChange}
+            isLastItem={index === items.length - 1}
           />
         ))}
-        <Flex alignItems="center" my={3}>
-          <Box flex="0 1" flexBasis={['3%', requireFile ? '53%' : '47%']} />
-          <Container fontSize="12px" fontWeight="500" mr={3} whiteSpace="nowrap">
-            <FormattedMessage id="ExpenseFormAttachments.TotalAmount" defaultMessage="Total amount:" />
-          </Container>
-          <ExpenseItemsTotalAmount name={name} currency={values.currency} items={items} />
+        <Flex alignItems="center" my={24}>
+          <Span color="black.900" fontSize="16px" lineHeight="21px" fontWeight="bold">
+            {taxType ? (
+              <FormattedMessage
+                defaultMessage="Total amount and {taxName}"
+                values={{ taxName: i18nTaxType(this.props.intl, taxType) }}
+              />
+            ) : (
+              <FormattedMessage id="TotalAmount" defaultMessage="Total amount" />
+            )}
+          </Span>
+          <StyledHr flex="1" borderColor="black.300" mx={2} />
+        </Flex>
+        <Flex justifyContent="space-between" alignItems="flex-end" flexWrap="wrap">
+          <Box flexBasis={['100%', null, null, '50%']} mb={3}>
+            {isSubjectToVAT && <ExpenseVATFormikFields formik={this.props.form} />}
+          </Box>
+          <Box mb={3} ml={[0, null, null, 4]} flexBasis={['100%', null, null, 'auto']}>
+            <ExpenseAmountBreakdown currency={values.currency} items={items} taxes={values.taxes} />
+          </Box>
         </Flex>
       </Box>
     );

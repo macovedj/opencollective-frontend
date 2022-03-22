@@ -22,7 +22,7 @@ import { H4, P, Span } from '../Text';
 import UploadedFilePreview from '../UploadedFilePreview';
 
 import ExpenseAdminActions from './ExpenseAdminActions';
-import ExpenseItemsTotalAmount from './ExpenseItemsTotalAmount';
+import ExpenseAmountBreakdown from './ExpenseAmountBreakdown';
 import ExpensePayeeDetails from './ExpensePayeeDetails';
 import ExpenseStatusTag from './ExpenseStatusTag';
 import ExpenseTags from './ExpenseTags';
@@ -69,6 +69,7 @@ const ExpenseSummary = ({
   const existsInAPI = expense && (expense.id || expense.legacyId);
   const createdByAccount = expense?.requestedByAccount || expense?.createdByAccount || {};
   const expenseItems = expense?.items.length > 0 ? expense.items : expense?.draft?.items || [];
+  const expenseTaxes = expense?.taxes?.length > 0 ? expense.taxes : expense?.draft?.taxes || [];
   const isMultiCurrency =
     expense?.amountInAccountCurrency && expense.amountInAccountCurrency.currency !== expense.currency;
 
@@ -250,12 +251,7 @@ const ExpenseSummary = ({
           {isLoading ? (
             <LoadingPlaceholder height={18} width={150} />
           ) : (
-            <React.Fragment>
-              <Container fontSize="12px" fontWeight="500" mr={3} whiteSpace="nowrap">
-                <FormattedMessage defaultMessage="Total amount ({currency}):" values={{ currency: expense.currency }} />
-              </Container>
-              <ExpenseItemsTotalAmount currency={expense.currency} items={expenseItems} />
-            </React.Fragment>
+            <ExpenseAmountBreakdown currency={expense.currency} items={expenseItems} taxes={expenseTaxes} />
           )}
         </Flex>
         {isMultiCurrency && (
