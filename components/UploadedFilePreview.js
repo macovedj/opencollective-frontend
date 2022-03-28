@@ -101,7 +101,7 @@ const UploadedFilePreview = ({
   alt,
   hasLink,
   fileName,
-  showFileName,
+  caption,
   border,
   ...props
 }) => {
@@ -159,19 +159,11 @@ const UploadedFilePreview = ({
       >
         {content}
       </CardContainer>
-      {showFileName && (
+      {caption && (
         <Box mt="6px" maxWidth={100}>
-          {isLoading ? (
-            <LoadingPlaceholder height={12} />
-          ) : fileName ? (
-            <P fontSize="12px" color="black.600" fontWeight="500">
-              {fileName}
-            </P>
-          ) : (
-            <P fontStyle="italic" fontSize="12px" color="black.600">
-              <FormattedMessage id="File.NoFilename" defaultMessage="No filename" />
-            </P>
-          )}
+          <P fontSize="12px" color="black.600" fontWeight="500">
+            {caption}
+          </P>
         </Box>
       )}
     </Container>
@@ -183,9 +175,9 @@ UploadedFilePreview.propTypes = {
   isPrivate: PropTypes.bool,
   isLoading: PropTypes.bool,
   isDownloading: PropTypes.bool,
-  showFileName: PropTypes.bool,
   alt: PropTypes.string,
   fileName: PropTypes.string,
+  caption: PropTypes.string,
   onClick: PropTypes.func,
   border: PropTypes.string,
   size: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),

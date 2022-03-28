@@ -135,6 +135,7 @@ const ExpenseFilesPreviewModal = ({ collective, expense, onClose }) => {
                   onClick={downloadInvoice}
                   isDownloading={isLoading}
                   fileName={getExpenseInvoiceFilename(collective, expense)}
+                  caption="Expense Invoice"
                   size={350}
                 />
               )}
