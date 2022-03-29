@@ -1080,7 +1080,7 @@
   "Fields.name": "Nazwa",
   "Fields.name.description": "Nazwy są wyświetlane publicznie i używane wszędzie tam, gdzie ten profil pojawia się publicznie, jak np. wpłaty, komentarze do aktualizacji, publiczne informacje o wydatkach itp.",
   "Fields.website": "Strona",
-  "File.NoFilename": "Brak nazwy pliku",
+  "File.{description_id}": "{description}",
   "FilesPreviewModal.AttachmentPreview": "Podgląd załącznika",
   "FilesUploadFailed": "Nie udało się przesłać {count, plural, one {pliku} few {# plików} many {# plików} other {# plików}}",
   "Filter.ByName": "Filtruj wg nazwy",

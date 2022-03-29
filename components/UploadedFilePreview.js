@@ -101,7 +101,7 @@ const UploadedFilePreview = ({
   alt,
   hasLink,
   fileName,
-  caption,
+  description,
   border,
   ...props
 }) => {
@@ -159,13 +159,20 @@ const UploadedFilePreview = ({
       >
         {content}
       </CardContainer>
-      {caption && (
+      {description && (
         <Box mt="6px" maxWidth={100}>
           {isLoading ? (
             <LoadingPlaceholder height={12} />
           ) : (
             <P fontSize="12px" color="black.600" fontWeight="500">
-              {caption}
+              <FormattedMessage
+                id={`File.{description_id}`}
+                defaultMessage={`{description}`}
+                values={{
+                  description: description,
+                  description_id: description.trim(),
+                }}
+              />
             </P>
           )}
         </Box>
@@ -181,7 +188,7 @@ UploadedFilePreview.propTypes = {
   isDownloading: PropTypes.bool,
   alt: PropTypes.string,
   fileName: PropTypes.string,
-  caption: PropTypes.string,
+  description: PropTypes.string,
   onClick: PropTypes.func,
   border: PropTypes.string,
   size: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),

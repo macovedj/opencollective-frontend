@@ -1080,7 +1080,7 @@
   "Fields.name": "Name",
   "Fields.name.description": "Display names are public and used wherever this profile appears publicly, like contributions, comments on updates, public info on expenses, etc.",
   "Fields.website": "Webseite",
-  "File.NoFilename": "No filename",
+  "File.{description_id}": "{description}",
   "FilesPreviewModal.AttachmentPreview": "Attachment preview",
   "FilesUploadFailed": "{count, plural, one {The file} other {# files}} failed to upload",
   "Filter.ByName": "Nach Namen filtern",

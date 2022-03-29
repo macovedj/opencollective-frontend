@@ -1080,7 +1080,7 @@
   "Fields.name": "Ім’я",
   "Fields.name.description": "Display names are public and used wherever this profile appears publicly, like contributions, comments on updates, public info on expenses, etc.",
   "Fields.website": "Вебсайт",
-  "File.NoFilename": "Немає назви файлу",
+  "File.{description_id}": "{description}",
   "FilesPreviewModal.AttachmentPreview": "Попередній перегляд вкладення",
   "FilesUploadFailed": "Не вдалося завантажити {count, plural, one {файл} other {# файлів}}",
   "Filter.ByName": "Фільтр за назвою",

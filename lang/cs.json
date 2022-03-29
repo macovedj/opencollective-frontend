@@ -1080,7 +1080,7 @@
   "Fields.name": "Název",
   "Fields.name.description": "Display names are public and used wherever this profile appears publicly, like contributions, comments on updates, public info on expenses, etc.",
   "Fields.website": "Webová stránka",
-  "File.NoFilename": "Žádný název souboru",
+  "File.{description_id}": "{description}",
   "FilesPreviewModal.AttachmentPreview": "Náhled přílohy",
   "FilesUploadFailed": "{count, plural, one {The file} other {# files}} failed to upload",
   "Filter.ByName": "Filtrovat podle jména",
