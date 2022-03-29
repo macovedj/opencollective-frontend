@@ -161,9 +161,13 @@ const UploadedFilePreview = ({
       </CardContainer>
       {caption && (
         <Box mt="6px" maxWidth={100}>
-          <P fontSize="12px" color="black.600" fontWeight="500">
-            {caption}
-          </P>
+          {isLoading ? (
+            <LoadingPlaceholder height={12} />
+          ) : (
+            <P fontSize="12px" color="black.600" fontWeight="500">
+              {caption}
+            </P>
+          )}
         </Box>
       )}
     </Container>
