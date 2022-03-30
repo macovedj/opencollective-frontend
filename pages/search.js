@@ -8,6 +8,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import i18nSearchSortingOptions from '../lib/i18n/search-sorting-options';
 import { parseToBoolean } from '../lib/utils';
 
 import CollectiveCard from '../components/CollectiveCard';
@@ -22,6 +23,7 @@ import StyledButton from '../components/StyledButton';
 import StyledFilters from '../components/StyledFilters';
 import StyledInput from '../components/StyledInput';
 import StyledLink from '../components/StyledLink';
+import { StyledSelectFilter } from '../components/StyledSelectFilter';
 import { H1, P } from '../components/Text';
 
 const SearchInput = styled(StyledInput)`
@@ -88,12 +90,25 @@ const I18nFilters = defineMessages({
 
 const DEFAULT_SEARCH_TYPES = ['COLLECTIVE', 'EVENT', 'ORGANIZATION', 'FUND', 'PROJECT'];
 
+const constructSortByQuery = sortByValue => {
+  let query = {};
+  if (sortByValue === 'ACTIVITY') {
+    query = { field: 'ACTIVITY', direction: 'DESC' };
+  } else if (sortByValue === 'CREATED_AT.DESC') {
+    query = { field: 'CREATED_AT', direction: 'DESC' };
+  } else if (sortByValue === 'CREATED_AT.ASC') {
+    query = { field: 'CREATED_AT', direction: 'ASC' };
+  }
+  return query;
+};
+
 class SearchPage extends React.Component {
   static getInitialProps({ query }) {
     return {
       term: query.q || '',
       types: query.types ? decodeURIComponent(query.types).split(',') : DEFAULT_SEARCH_TYPES,
       isHost: isNil(query.isHost) ? undefined : parseToBoolean(query.isHost),
+      sortBy: query.sortBy || 'ACTIVITY',
       limit: Number(query.limit) || 20,
       offset: Number(query.offset) || 0,
     };
@@ -101,6 +116,7 @@ class SearchPage extends React.Component {
 
   static propTypes = {
     term: PropTypes.string, // for addSearchQueryData
+    sortBy: PropTypes.string, // for addSearchQueryData
     limit: PropTypes.number, // for addSearchQueryData
     offset: PropTypes.number, // for addSearchQueryData
     router: PropTypes.object, // from next.js
@@ -114,6 +130,13 @@ class SearchPage extends React.Component {
     this.state = { filter: 'ALL' };
   }
 
+  changeSort = sortBy => {
+    const { router, term } = this.props;
+    const query = { q: term, types: router.query.types, isHost: router.query.isHost };
+    query.sortBy = sortBy.value;
+    router.push({ pathname: router.pathname, query });
+  };
+
   refetch = event => {
     event.preventDefault();
 
@@ -121,19 +144,25 @@ class SearchPage extends React.Component {
     const { router } = this.props;
     const { q } = form;
 
-    router.push({ pathname: router.pathname, query: { q: q.value, types: router.query.types } });
+    const query = { q: q.value, types: router.query.types, sortBy: router.query.sortBy };
+    router.push({ pathname: router.pathname, query });
   };
 
   onClick = filter => {
-    const { term } = this.props;
+    const { term, router } = this.props;
+    let query;
 
     if (filter === 'HOST') {
-      this.props.router.push({ pathname: '/search', query: { q: term, isHost: true } });
+      query = { q: term, isHost: true };
     } else if (filter !== 'ALL') {
-      this.props.router.push({ pathname: '/search', query: { q: term, types: filter } });
+      query = { q: term, types: filter };
     } else {
-      this.props.router.push({ pathname: '/search', query: { q: term } });
+      query = { q: term };
     }
+
+    query.sortBy = router.query.sortBy;
+
+    router.push({ pathname: '/search', query });
   };
 
   changePage = offset => {
@@ -152,6 +181,8 @@ class SearchPage extends React.Component {
     const filters = ['ALL', 'COLLECTIVE', 'EVENT', 'ORGANIZATION', 'HOST'];
     const { limit = 20, offset, totalCount = 0 } = accounts || {};
     const showCollectives = term.trim() !== '' && !!accounts?.nodes;
+    const getOption = value => ({ label: i18nSearchSortingOptions(intl, value), value });
+    const options = [getOption('ACTIVITY'), getOption('CREATED_AT.DESC'), getOption('CREATED_AT.ASC')];
 
     return (
       <Page title="Search" showSearch={false}>
@@ -170,19 +201,29 @@ class SearchPage extends React.Component {
             </form>
           </Box>
           {term && (
-            <Box mt={4} mb={4} mx="auto">
-              <StyledFilters
-                filters={filters}
-                getLabel={key => intl.formatMessage(I18nFilters[key], { count: 10 })}
-                selected={this.state.filter}
-                justifyContent="left"
-                minButtonWidth={150}
-                onChange={filter => {
-                  this.setState({ filter: filter });
-                  this.onClick(filter);
-                }}
-              />
-            </Box>
+            <Flex mt={4} mb={4} mx="auto">
+              <Container width={[1, 4 / 5]}>
+                <StyledFilters
+                  filters={filters}
+                  getLabel={key => intl.formatMessage(I18nFilters[key], { count: 10 })}
+                  selected={this.state.filter}
+                  justifyContent="left"
+                  minButtonWidth={150}
+                  onChange={filter => {
+                    this.setState({ filter: filter });
+                    this.onClick(filter);
+                  }}
+                />
+              </Container>
+              <Container width={[1, 1 / 5]}>
+                <StyledSelectFilter
+                  inputId="sort-filter"
+                  value={this.props.sortBy ? getOption(this.props.sortBy) : options[0]}
+                  options={options}
+                  onChange={sortBy => this.changeSort(sortBy)}
+                />
+              </Container>
+            </Flex>
           )}
           <Flex justifyContent={['center', 'center', 'flex-start']} flexWrap="wrap">
             {loading && accounts?.nodes?.length > 0 && (
@@ -268,7 +309,14 @@ class SearchPage extends React.Component {
 export { SearchPage as MockSearchPage };
 
 export const searchPageQuery = gqlV2/* GraphQL */ `
-  query SearchPage($term: String!, $type: [AccountType], $isHost: Boolean, $limit: Int, $offset: Int) {
+  query SearchPage(
+    $term: String!
+    $type: [AccountType]
+    $isHost: Boolean
+    $sortBy: OrderByInput
+    $limit: Int
+    $offset: Int
+  ) {
     accounts(
       searchTerm: $term
       type: $type
@@ -276,6 +324,7 @@ export const searchPageQuery = gqlV2/* GraphQL */ `
       limit: $limit
       offset: $offset
       skipRecentAccounts: true
+      orderBy: $sortBy
     ) {
       nodes {
         id
@@ -321,7 +370,17 @@ export const searchPageQuery = gqlV2/* GraphQL */ `
 
 export const addSearchPageData = graphql(searchPageQuery, {
   skip: props => !props.term,
-  options: { context: API_V2_CONTEXT },
+  options: props => ({
+    context: API_V2_CONTEXT,
+    variables: {
+      term: props.term,
+      type: props.type,
+      isHost: props.isHost,
+      limit: props.limit,
+      offset: props.offset,
+      sortBy: constructSortByQuery(props.sortBy),
+    },
+  }),
 });
 
 export default injectIntl(withRouter(addSearchPageData(SearchPage)));
