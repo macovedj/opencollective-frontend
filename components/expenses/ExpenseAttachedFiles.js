@@ -21,7 +21,7 @@ const ExpenseAttachedFiles = ({ files, onRemove, showInvoice, collective, expens
                 onClick={downloadInvoice}
                 isDownloading={isLoading}
                 fileName={getExpenseInvoiceFilename(collective, expense)}
-                description="Download expense"
+                describe="expense"
                 size={88}
               />
             )}
@@ -30,7 +30,7 @@ const ExpenseAttachedFiles = ({ files, onRemove, showInvoice, collective, expens
       )}
       {files.map((file, idx) => (
         <Box key={file.id || file.url} mr={3} mb={3}>
-          <UploadedFilePreview size={88} url={file.url} fileName={file.name} description="Attached file" />
+          <UploadedFilePreview size={88} url={file.url} fileName={file.name} describe="attachment" />
           {onRemove && (
             <StyledLinkButton variant="danger" fontSize="12px" mt={1} onClick={() => onRemove(idx)}>
               <FormattedMessage id="Remove" defaultMessage="Remove" />
