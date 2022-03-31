@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Download } from '@styled-icons/feather/Download';
 import { FileText } from '@styled-icons/feather/FileText';
 import { endsWith, max } from 'lodash';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { imagePreview } from '../lib/image-utils';
@@ -87,19 +87,6 @@ const PrivateIconContainer = styled.div`
   }
 `;
 
-const Message = () => injectIntl(({ id, intl }) => intl.formatMessage(id));
-
-const messages = defineMessages({
-  expense: {
-    id: 'File.DownloadExpense',
-    defaultMessage: 'Download expense',
-  },
-  attached: {
-    id: 'File.AttachedFile',
-    defaultMessage: 'Attached file',
-  },
-});
-
 /**
  * To display the preview of a file uploaded on Open Collective.
  * Supports images and PDFs.
@@ -114,7 +101,7 @@ const UploadedFilePreview = ({
   alt,
   hasLink,
   fileName,
-  describe,
+  description,
   border,
   ...props
 }) => {
@@ -172,13 +159,13 @@ const UploadedFilePreview = ({
       >
         {content}
       </CardContainer>
-      {describe && (
+      {description && (
         <Box mt="6px" maxWidth={100}>
           {isLoading ? (
             <LoadingPlaceholder height={12} />
           ) : (
             <P fontSize="12px" color="black.600" fontWeight="500">
-              {Message(describe === 'expense' ? messages.expense : messages.attached)}
+              {description}
             </P>
           )}
         </Box>
@@ -194,7 +181,7 @@ UploadedFilePreview.propTypes = {
   isDownloading: PropTypes.bool,
   alt: PropTypes.string,
   fileName: PropTypes.string,
-  describe: PropTypes.string,
+  description: PropTypes.string,
   onClick: PropTypes.func,
   border: PropTypes.string,
   size: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),

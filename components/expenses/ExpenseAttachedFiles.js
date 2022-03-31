@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
 
@@ -9,6 +9,17 @@ import StyledLinkButton from '../StyledLinkButton';
 import UploadedFilePreview from '../UploadedFilePreview';
 
 import ExpenseInvoiceDownloadHelper, { getExpenseInvoiceFilename } from './ExpenseInvoiceDownloadHelper';
+
+const getAttachmentDescription = injectIntl((idx, totalNbFiles, intl) => {
+  if (totalNbFiles === 1) {
+    return intl.formatMessage({
+      id: 'File.AttachedFile',
+      defaultMessage: 'Attached file',
+    });
+  } else {
+    return intl.formatMessage({ defaultMessage: 'Attached file {number}' }, { number: idx + 1 });
+  }
+});
 
 const ExpenseAttachedFiles = ({ files, onRemove, showInvoice, collective, expense }) => {
   return (
@@ -21,7 +32,7 @@ const ExpenseAttachedFiles = ({ files, onRemove, showInvoice, collective, expens
                 onClick={downloadInvoice}
                 isDownloading={isLoading}
                 fileName={getExpenseInvoiceFilename(collective, expense)}
-                describe="expense"
+                description={<FormattedMessage id="File.DownloadExpense" defaultMessage="Download expense" />}
                 size={88}
               />
             )}
@@ -30,7 +41,12 @@ const ExpenseAttachedFiles = ({ files, onRemove, showInvoice, collective, expens
       )}
       {files.map((file, idx) => (
         <Box key={file.id || file.url} mr={3} mb={3}>
-          <UploadedFilePreview size={88} url={file.url} fileName={file.name} describe="attachment" />
+          <UploadedFilePreview
+            size={88}
+            url={file.url}
+            fileName={file.name}
+            description={getAttachmentDescription(idx, files.length)}
+          />
           {onRemove && (
             <StyledLinkButton variant="danger" fontSize="12px" mt={1} onClick={() => onRemove(idx)}>
               <FormattedMessage id="Remove" defaultMessage="Remove" />
