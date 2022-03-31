@@ -12,10 +12,7 @@ import ExpenseInvoiceDownloadHelper, { getExpenseInvoiceFilename } from './Expen
 
 const getAttachmentDescription = injectIntl((idx, totalNbFiles, intl) => {
   if (totalNbFiles === 1) {
-    return intl.formatMessage({
-      id: 'File.AttachedFile',
-      defaultMessage: 'Attached file',
-    });
+    return intl.formatMessage({ id: 'File.AttachedFile', defaultMessage: 'Attached file' });
   } else {
     return intl.formatMessage({ defaultMessage: 'Attached file {number}' }, { number: idx + 1 });
   }
